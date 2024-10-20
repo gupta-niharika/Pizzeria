@@ -1,98 +1,62 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-class PizzaMenu(models.Model):
-    class VegNonVegChoices:
-        VEG = 'Veg'
-        NON_VEG = 'Non-Veg'
-        
-        VEG_NON_VEG_CHOICES = [
-            (VEG, 'Vegetarian'),
-            (NON_VEG, 'Non-Vegetarian'),
-        ]
-    
-    class SauceChoices:
-        TOMATO = 'Tomato'
-        BBQ = 'BBQ'
-        MARINARA = 'Marinara'
-        PESTO = 'Pesto'
-        PERI_PERI = 'Peri-Peri'
-        MAKHANI = 'Makhani'
-        
-        SAUCE_CHOICES = [
-            (TOMATO, 'Tomato Sauce'),
-            (BBQ, 'BBQ Sauce'),
-            (MARINARA, 'Marinara Sauce'),
-            (PESTO, 'Pesto Sauce'),
-            (PERI_PERI, 'Peri-Peri Sauce'),
-            (MAKHANI, 'Makhani Sauce'),
-        ]
-        
-    class CrustChoices:
-        THIN = 'Thin'
-        FRESH_PAN = 'Fresh Pan'
-        CHEESE_BURST = 'Cheese Burst'
-        HAND_TOSSED = 'Hand Tossed'
-        
-        CRUST_CHOICES = [
-            (THIN, 'Thin Crust'),
-            (FRESH_PAN, 'Fresh Pan Crust'),
-            (CHEESE_BURST, 'Cheese Burst Crust'),
-            (HAND_TOSSED, 'Hand Tossed Crust'),
-        ]
-        
-    class ToppingChoices:
-        MUSHROOMS = 'Mushrooms'
-        CAPSICUM = 'Capsicum'
-        ONIONS = 'Onions'
-        OLIVES = 'Olives'
-        SPINACH = 'Spinach'
-        PANEER = 'Paneer'
-        BBQ_CHICKEN = 'BBQ Chicken'
-        SAUSAGE_CHICKEN = 'Sausage Chicken'
-        SHREDDED_CHICKEN = 'Shredded Chicken'
-        SHRIMP = 'Shrimp'
-        SWEET_CORN = 'Sweet Corn'
-        CHERRY_TOMATO = 'Cherry Tomato'
-        BABY_CORN = 'Baby Corn'
-        JALAPEÑOS = 'Jalapeños'
-        
-        TOPPING_CHOICES = [
-            (MUSHROOMS, 'Mushrooms'),
-            (CAPSICUM, 'Capsicum'),
-            (ONIONS, 'Onions'),
-            (OLIVES, 'Olives'),
-            (SPINACH, 'Spinach'),
-            (PANEER, 'Paneer'),
-            (BBQ_CHICKEN, 'BBQ Chicken'),
-            (SAUSAGE_CHICKEN, 'Sausage Chicken'),
-            (SHREDDED_CHICKEN, 'Shredded Chicken'),
-            (SHRIMP, 'Shrimp'),
-            (SWEET_CORN, 'Sweet Corn'),
-            (CHERRY_TOMATO, 'Cherry Tomato'),
-            (BABY_CORN, 'Baby Corn'),
-            (JALAPEÑOS, 'Jalapeños'),
-        ]
+class SizePrice(models.Model):
+    class SizeChoices(models.TextChoices):
+        SMALL = 'small', _('Small')
+        MEDIUM = 'medium', _('Medium')
+        LARGE = 'large', _('Large')
 
-    id = models.AutoField(primary_key=True)
-    veg_non_veg = models.CharField(
-        max_length=10,
-        choices=VegNonVegChoices.VEG_NON_VEG_CHOICES,
-        default=VegNonVegChoices.VEG,
-        verbose_name="Vegetarian/Non-Vegetarian",
-        help_text="Select whether the pizza is vegetarian or non-vegetarian."
-    )
-    pizza_name = models.CharField(max_length=100, verbose_name="Pizza Name", help_text="Enter the name of the pizza.")
-    price_small = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Price (Small)", help_text="Enter the price for a small pizza.")
-    price_medium = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Price (Medium)", help_text="Enter the price for a medium pizza.")
-    price_large = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Price (Large)", help_text="Enter the price for a large pizza.")
-    size = models.CharField(max_length=20, verbose_name="Size", help_text="Select the size of the pizza.")
-    toppings = models.CharField(max_length=255, choices=ToppingChoices.TOPPING_CHOICES, verbose_name="Toppings", help_text="Select the toppings for the pizza.", blank=True)
-    crust = models.CharField(max_length=20, choices=CrustChoices.CRUST_CHOICES, verbose_name="Crust Type", help_text="Select the type of crust.")
-    sauce = models.CharField(max_length=20, choices=SauceChoices.SAUCE_CHOICES, verbose_name="Sauce Type", help_text="Select the type of sauce.")
-    gluten_allergen_info = models.TextField(verbose_name="Gluten/Allergen Info", help_text="Provide allergen information.")
-
-    class Meta:
-        db_table = 'pizza_menu' 
+    size = models.CharField(max_length=6, choices=SizeChoices.choices, verbose_name=_('Size'), help_text=_('Select the size of the pizza.'))
+    price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name=_('Price'), help_text=_('Enter the price for the selected size.'))
 
     def __str__(self):
-        return self.pizza_name
+        return f"{self.size} - ${self.price}"
+
+class PizzaMenu(models.Model):
+    class DietaryTypeChoices(models.TextChoices):
+        VEG = 'veg', _('Vegetarian')
+        NOVEG = 'noveg', _('Non-Vegetarian')
+
+    class CrustChoices(models.TextChoices):
+        THIN = 'thin', _('Thin')
+        HAND_TOSSED = 'hand_tossed', _('Hand Tossed')
+        FRESH_PAN = 'fresh_pan', _('Fresh Pan')
+        CHEESE_BURST = 'cheese_burst', _('Cheese Burst')
+
+    class SauceChoices(models.TextChoices):
+        MARINARA = 'marinara', _('Marinara')
+        TOMATO = 'tomato', _('Tomato')
+        BBQ = 'bbq', _('BBQ')
+        PESTO = 'pesto', _('Pesto')
+        MAKANI = 'makhani', _('Makhani')
+        PERI_PERI = 'peri_peri', _('Peri-Peri')
+
+    class ToppingChoices(models.TextChoices):
+        MUSHROOM = 'mushroom', _('Mushroom')
+        BABY_CORN = 'baby_corn', _('Baby Corn')
+        SWEET_CORN = 'sweet_corn', _('Sweet Corn')
+        JALAPENOS = 'jalapenos', _('Jalapeños')
+        PEPPERS = 'peppers', _('Peppers')
+        ONION = 'onion', _('Onion')
+        TOMATO = 'tomato', _('Tomato')
+        PINEAPPLE = 'pineapple', _('Pineapple')
+        BBQ_CHICKEN = 'bbq_chicken', _('BBQ Chicken')
+        CHICKEN_SAUSAGE = 'chicken_sausage', _('Chicken Sausage')
+        SHRIMP = 'shrimp', _('Shrimp')
+        PEPPERONI = 'pepperoni', _('Pepperoni')
+
+    id = models.AutoField(primary_key=True, verbose_name=_('Pizza ID'), help_text=_('Unique identifier for each pizza entry.'))
+    dietary_type = models.CharField(max_length=6, choices=DietaryTypeChoices.choices, verbose_name=_('Dietary Type'), help_text=_('Select whether the pizza is vegetarian or non-vegetarian.'))
+    pizza_name = models.CharField(max_length=100, verbose_name=_('Pizza Name'), help_text=_('Enter the name of the pizza.'))
+    size_price = models.ForeignKey(SizePrice, on_delete=models.CASCADE, verbose_name=_('Size and Price'), help_text=_('Select the size and price for the pizza.'))
+    toppings = models.CharField(max_length=50, choices=ToppingChoices.choices, verbose_name=_('Toppings'), help_text=_('Select toppings for the pizza.'), blank=True)
+    crust = models.CharField(max_length=12, choices=CrustChoices.choices, verbose_name=_('Crust Type'), help_text=_('Select the type of crust for the pizza.'))
+    sauce = models.CharField(max_length=10, choices=SauceChoices.choices, default=SauceChoices.TOMATO, verbose_name=_('Sauce Type'), help_text=_('Select the type of sauce for the pizza.'))
+    gluten_allergen_info = models.TextField(blank=True, verbose_name=_('Gluten/Allergen Info'), help_text=_('Provide gluten and allergen information (optional).'))
+
+    class Meta:
+        db_table = 'pizza_menu'
+
+    def __str__(self):
+        return f"{self.pizza_name} - {self.size_price.size} - {self.dietary_type}"
